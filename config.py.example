@@ -1,0 +1,28 @@
+import configparser
+
+base_config = {
+    "BOT": {
+        "TOKEN": "",
+        "DESCRIPTION": "Personal Discord Bot",
+        "STATS_WEBHOOK": "",
+        "LOGGING_WEBHOOK": "",
+    },
+    "DATABASE": {
+        "DSN": "postgres://dokusei:verysecurepassword@127.0.0.1:5432/dokusei",
+    },
+    "LINKS": {
+        "REPO": "https://github.com/Dunc4nNT/Dokusei",
+        "WEBSITE": "https://dunc4nnt.github.io/Dokusei-Website/",
+        "DOCS": "https://dunc4nnt.github.io/Dokusei-Docs/",
+        "DASHBOARD": "https://dunc4nnt.github.io/Dokusei-Dashboard/",
+        "SUPPORT": "soon™",
+    },
+    "DEV": {
+        "MODE": "development",  # development/production
+        "VERSION": "0.0.1",
+        "TEST_GUILD_ID": "",
+    },
+}
+
+config = configparser.ConfigParser(interpolation=None)
+config.read_dict(base_config)
