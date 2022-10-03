@@ -61,8 +61,12 @@ class DokuseiBot(commands.Bot):
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ) -> None:
-        if ctx.command.has_error_handler() or ctx.cog.has_error_handler():  # type: ignore
-            return
+        if ctx.command:
+            if ctx.command.has_error_handler():
+                return
+        if ctx.cog:
+            if ctx.cog.has_error_handler():
+                return
 
         ignored_errors = (
             commands.CommandNotFound,
@@ -98,12 +102,17 @@ class DokuseiBot(commands.Bot):
     async def on_app_command_error(
         self, interaction: discord.Interaction, error: app_commands.AppCommandError
     ) -> None:
-        if interaction.command._has_any_error_handlers():  # type: ignore
-            return
+        if interaction.command:
+            if interaction.command._has_any_error_handlers():
+                return
 
         # TODO: figure out a way to check if an error handler already exists inside the interaction's cog
 
-        if isinstance(error, app_commands.MissingRole) or isinstance(
+        if isinstance(error, app_commands.CommandNotFound):
+            await interaction.response.send_message(
+                "This command is temporarily disabled.", ephemeral=True
+            )
+        elif isinstance(error, app_commands.MissingRole) or isinstance(
             error, app_commands.MissingAnyRole
         ):
             await interaction.response.send_message(
