@@ -5,6 +5,7 @@ from typing import Any
 import aiohttp
 import asyncpg
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 
@@ -28,6 +29,7 @@ class DokuseiBot(commands.Bot):
         self.global_logger = logging.getLogger(__name__)
 
     async def setup_hook(self) -> None:
+        self.tree.on_error = self.on_app_command_error
         self.app_info = await self.application_info()
         self.owner_id = self.app_info.owner.id
         self.counters = {
@@ -59,6 +61,9 @@ class DokuseiBot(commands.Bot):
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ) -> None:
+        if ctx.command.has_error_handler() or ctx.cog.has_error_handler():  # type: ignore
+            return
+
         ignored_errors = (
             commands.CommandNotFound,
             commands.CheckFailure,
@@ -88,6 +93,40 @@ class DokuseiBot(commands.Bot):
 
             self.global_logger.error(
                 f"Ignoring exception in command {ctx.command}", exc_info=error
+            )
+
+    async def on_app_command_error(
+        self, interaction: discord.Interaction, error: app_commands.AppCommandError
+    ) -> None:
+        if interaction.command._has_any_error_handlers():  # type: ignore
+            return
+
+        # TODO: figure out a way to check if an error handler already exists inside the interaction's cog
+
+        if isinstance(error, app_commands.MissingRole) or isinstance(
+            error, app_commands.MissingAnyRole
+        ):
+            await interaction.response.send_message(
+                "You are missing the required role(s) to run this command",
+                ephemeral=True,
+            )
+        elif isinstance(error, app_commands.CheckFailure):
+            await interaction.response.send_message(
+                "A check has failed, possible causes for this could be:\n"
+                "- You do not have the required role(s)\n"
+                "- You do not have the required permissions\n"
+                "- The command is disabled\n"
+                "- You are banned from using commands",
+                ephemeral=True,
+            )
+        else:
+            await interaction.response.send_message(
+                "Something went wrong while processing this interaction.",
+                ephemeral=True,
+            )
+
+            self.global_logger.error(
+                "Ignoring exception in interaction.", exc_info=error
             )
 
 
