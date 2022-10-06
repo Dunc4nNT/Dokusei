@@ -4,10 +4,11 @@ import logging
 from typing import TYPE_CHECKING
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
-from dokusei.resources import LANGUAGES
-from dokusei.utils.errors import ButtonOnCooldown
+from dokusei.resources import LANG_CODES_LINK, LANGUAGES
+from dokusei.utils.errors import ButtonOnCooldown, TransformerError
 from dokusei.utils.translator import translate
 from dokusei.utils.utils import interaction_cooldown_key
 
@@ -136,6 +137,31 @@ class TranslationSelect(discord.ui.Select):
         )
 
         await interaction.response.edit_message(embed=embed)
+
+
+class TranslateTransformer(app_commands.Transformer):
+    async def transform(self, interaction: discord.Interaction, value: str, /) -> str:
+        if value in LANGUAGES:
+            return value
+        raise TransformerError(
+            f'"{value}" is not a language, please check <{LANG_CODES_LINK}> for a list of all the available languages.'
+        )
+
+    async def autocomplete(
+        self, interaction: discord.Interaction, value: str, /
+    ) -> list[app_commands.Choice[str]]:
+        if not value:
+            return [
+                app_commands.Choice(name=language["name"], value=lang_code)
+                for lang_code, language in LANGUAGES.items()
+                if language["top"] is True
+            ][:25]
+
+        return [
+            app_commands.Choice(name=language["name"], value=lang_code)
+            for lang_code, language in LANGUAGES.items()
+            if language["name"].lower().startswith(value.lower())
+        ][:25]
 
 
 async def translation_embed(

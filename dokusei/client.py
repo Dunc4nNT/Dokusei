@@ -8,6 +8,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from dokusei.utils.errors import TransformerError
+
 
 class DokuseiBot(commands.Bot):
     user: discord.ClientUser
@@ -130,6 +132,8 @@ class DokuseiBot(commands.Bot):
                 "- You are banned from using commands",
                 ephemeral=True,
             )
+        elif isinstance(error, TransformerError):
+            await interaction.response.send_message(str(error))
         else:
             await interaction.response.send_message(
                 "Something went wrong while processing this interaction.",

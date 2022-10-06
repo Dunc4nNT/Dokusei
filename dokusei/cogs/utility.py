@@ -7,7 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from dokusei.utils import translate
-from dokusei.utils.views import TranslationView, translation_embed
+from dokusei.utils.views import TranslateTransformer, TranslationView, translation_embed
 
 if TYPE_CHECKING:
     from dokusei import DokuseiBot
@@ -73,7 +73,11 @@ class Utility(commands.Cog):
     @utility_group.command()
     @app_commands.checks.cooldown(1, 30.0, key=lambda i: (i.guild_id, i.user.id))
     async def translate(
-        self, interaction: discord.Interaction, language: str, *, message: str
+        self,
+        interaction: discord.Interaction,
+        language: app_commands.Transform[str, TranslateTransformer],
+        *,
+        message: str,
     ) -> None:
         (
             source_language_code,
