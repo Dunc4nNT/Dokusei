@@ -46,14 +46,6 @@ class DokuseiBot(commands.Bot):
                     f"Failed to load extension: {extension}", error
                 )
 
-        if (
-            self.config["DEV"]["TEST_GUILD_ID"]
-            and self.config["DEV"]["MODE"] == "development"
-        ):
-            guild = discord.Object(self.config["DEV"]["TEST_GUILD_ID"])
-            self.tree.copy_global_to(guild=guild)
-            await self.tree.sync(guild=guild)
-
     async def on_ready(self):
         if not hasattr(self, "start_time"):
             self.start_time = discord.utils.utcnow()

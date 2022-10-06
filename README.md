@@ -59,7 +59,6 @@ Rename `config.py.example` to `config.py` and fill in the following values:
 "DEV": {
     "MODE": "development",  // development/production
     "VERSION": "0.0.1", // just keep it on production, development mode has some extra dev things
-    "TEST_GUILD_ID": "", // optional test guild for development stuff
 },
 ```
 

@@ -70,6 +70,8 @@ class BotInfoSelect(discord.ui.Select):
             case "1":
                 embed = await system_info_embed(self.client)
                 await interaction.response.edit_message(embed=embed)
+            case _:
+                pass
 
 
 async def client_info_embed(client: DokuseiBot) -> discord.Embed:

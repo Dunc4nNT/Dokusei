@@ -29,42 +29,19 @@ class Utility(commands.Cog):
     async def translate_ctx_menu(
         self, interaction: discord.Interaction, message: discord.Message
     ) -> None:
-        (
-            source_language_code,
-            source_language,
-            source_message,
-            translated_language_code,
-            translated_language,
-            translated_message,
-            confidence,
-        ) = await translate(
+        translate_response = await translate(
             message.content,
             self.client.config["TRANSLATE"]["PRIMARY_LANGUAGE"],
             self.client.session,
         )
 
-        embed = await translation_embed(
-            source_language_code,
-            source_language,
-            translated_language_code,
-            translated_language,
-            translated_message,
-            confidence,
-            message.jump_url,
-        )
+        embed = await translation_embed(translate_response, message.jump_url)
 
         await interaction.response.send_message(
             embed=embed,
             view=TranslationView(
                 interaction.user,
-                self.client,
-                source_language_code,
-                source_language,
-                source_message,
-                translated_language_code,
-                translated_language,
-                translated_message,
-                confidence,
+                translate_response,
                 message.jump_url,
                 cooldown=30,
             ),
@@ -82,43 +59,13 @@ class Utility(commands.Cog):
         *,
         message: str,
     ) -> None:
-        (
-            source_language_code,
-            source_language,
-            source_message,
-            translated_language_code,
-            translated_language,
-            translated_message,
-            confidence,
-        ) = await translate(
-            message,
-            language,
-            self.client.session,
-        )
+        translate_response = await translate(message, language, self.client.session)
 
-        embed = await translation_embed(
-            source_language_code,
-            source_language,
-            translated_language_code,
-            translated_language,
-            translated_message,
-            confidence,
-        )
+        embed = await translation_embed(translate_response)
 
         await interaction.response.send_message(
             embed=embed,
-            view=TranslationView(
-                interaction.user,
-                self.client,
-                source_language_code,
-                source_language,
-                source_message,
-                translated_language_code,
-                translated_language,
-                translated_message,
-                confidence,
-                cooldown=30,
-            ),
+            view=TranslationView(interaction.user, translate_response, cooldown=30),
         )
 
 

@@ -23,7 +23,6 @@ base_config = {
     "DEV": {
         "MODE": "development",  # development/production
         "VERSION": "0.0.1",
-        "TEST_GUILD_ID": "",
     },
 }
 

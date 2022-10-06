@@ -1,73 +1,33 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import discord
 from discord import app_commands
 
 from dokusei.resources import LANG_CODES_LINK, LANGUAGES, LANGUAGES_BY_NAME
 from dokusei.utils.errors import TransformerError
-from dokusei.utils.translator import translate
+from dokusei.utils.translator import TranslateResponse, translate
 from dokusei.utils.views.base import BaseView
-
-if TYPE_CHECKING:
-    from dokusei import DokuseiBot
 
 
 class TranslationView(BaseView):
     def __init__(
         self,
         author: discord.User | discord.Member,
-        client: DokuseiBot,
-        source_language_code,
-        source_language,
-        source_message,
-        translated_language_code,
-        translated_language,
-        translated_message,
-        confidence,
-        original_message_link="",
+        translate_response: TranslateResponse,
+        original_message_link: str = "",
         *,
         cooldown: float,
     ):
         super().__init__(author=author, cooldown=cooldown)
 
-        self.add_item(
-            TranslationSelect(
-                client,
-                source_language_code,
-                source_language,
-                source_message,
-                translated_language_code,
-                translated_language,
-                translated_message,
-                confidence,
-                original_message_link,
-            )
-        )
+        self.add_item(TranslationSelect(translate_response, original_message_link))
 
 
 class TranslationSelect(discord.ui.Select):
     def __init__(
-        self,
-        client,
-        source_language_code,
-        source_language,
-        source_message,
-        translated_language_code,
-        translated_language,
-        translated_message,
-        confidence,
-        original_message_link="",
+        self, translate_response: TranslateResponse, original_message_link: str = ""
     ):
-        self.client = client
-        self.source_language_code = source_language_code
-        self.source_language = source_language
-        self.source_message = source_message
-        self.translated_language_code = translated_language_code
-        self.translated_language = translated_language
-        self.translated_message = translated_message
-        self.confidence = confidence
+        self.translate_response = translate_response
         self.original_message_link = original_message_link
         options = [
             discord.SelectOption(
@@ -84,29 +44,13 @@ class TranslationSelect(discord.ui.Select):
         super().__init__(min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        (
-            source_language_code,
-            source_language,
-            source_message,
-            translated_language_code,
-            translated_language,
-            translated_message,
-            confidence,
-        ) = await translate(
-            self.source_message,
+        translate_response: TranslateResponse = await translate(
+            self.translate_response.source_message,
             self.values[0],
-            self.client.session,
+            interaction.client.session,
         )
 
-        embed = await translation_embed(
-            source_language_code,
-            source_language,
-            translated_language_code,
-            translated_language,
-            translated_message,
-            confidence,
-            self.original_message_link,
-        )
+        embed = await translation_embed(translate_response, self.original_message_link)
 
         await interaction.response.edit_message(embed=embed)
 
@@ -137,17 +81,12 @@ class TranslateTransformer(app_commands.Transformer):
 
 
 async def translation_embed(
-    source_language_code,
-    source_language,
-    translated_language_code,
-    translated_language,
-    translated_message,
-    confidence,
-    original_message_link="",
+    translate_response: TranslateResponse,
+    original_message_link: str = "",
 ) -> discord.Embed:
     embed = discord.Embed(
         title="Translation",
-        description=f"Translated [a message]({original_message_link}) from {LANGUAGES[source_language_code]['flag']} {source_language} ({confidence*100}% confidence) to {LANGUAGES[translated_language_code]['flag']} {translated_language}.\n\n```\n{translated_message}```",
+        description=f"Translated [a message]({original_message_link}) from {LANGUAGES[translate_response.source_language_code]['flag']} {translate_response.source_language} ({translate_response.confidence*100}% confidence) to {LANGUAGES[translate_response.translated_language_code]['flag']} {translate_response.translated_language}.\n\n```\n{translate_response.translated_message}```",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )

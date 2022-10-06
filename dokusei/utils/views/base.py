@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 import discord
 from discord.ext import commands
@@ -45,7 +46,7 @@ class BaseView(discord.ui.View):
         self,
         interaction: discord.Interaction,
         error: Exception,
-        item: discord.ui.Item,
+        item: discord.ui.Item[Any],
     ) -> None:
         if isinstance(error, ButtonOnCooldown):
             time_left = round(error.time_left, 2)

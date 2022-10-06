@@ -60,5 +60,5 @@ async def translate(message: str, language: str, session: ClientSession):
             translated_language_code=language,
             translated_language=LANGUAGES[language]["name"],
             translated_message=translated_message,
-            confidence=round(confidence, 4),
+            confidence=confidence,
         )
