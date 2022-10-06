@@ -19,6 +19,23 @@ if TYPE_CHECKING:
     from dokusei import DokuseiBot
 
 
+class BotInfoSelectView(discord.ui.View):
+    def __init__(self, client: DokuseiBot, *, timeout: int = 300):
+        super().__init__(timeout=timeout)
+        self.logger: logging.Logger = logging.getLogger(__name__)
+
+        self.add_item(BotInfoSelect(client))
+        self.add_item(
+            discord.ui.Button(
+                label="Invite",
+                url=f"https://discord.com/oauth2/authorize?client_id={client.user.id}&scope=bot&permissions=8",
+            )
+        )
+        self.add_item(
+            discord.ui.Button(label="Website", url=client.config["LINKS"]["WEBSITE"])
+        )
+
+
 class BotInfoSelect(discord.ui.Select):
     def __init__(self, client: DokuseiBot):
         self.client: DokuseiBot = client
@@ -46,23 +63,6 @@ class BotInfoSelect(discord.ui.Select):
             case "1":
                 embed = await system_info_embed(self.client)
                 await interaction.response.edit_message(embed=embed)
-
-
-class BotInfoSelectView(discord.ui.View):
-    def __init__(self, client: DokuseiBot, *, timeout: int = 300):
-        super().__init__(timeout=timeout)
-        self.logger: logging.Logger = logging.getLogger(__name__)
-
-        self.add_item(BotInfoSelect(client))
-        self.add_item(
-            discord.ui.Button(
-                label="Invite",
-                url=f"https://discord.com/oauth2/authorize?client_id={client.user.id}&scope=bot&permissions=8",
-            )
-        )
-        self.add_item(
-            discord.ui.Button(label="Website", url=client.config["LINKS"]["WEBSITE"])
-        )
 
 
 async def client_info_embed(client: DokuseiBot) -> discord.Embed:

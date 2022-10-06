@@ -43,6 +43,9 @@ Rename `config.py.example` to `config.py` and fill in the following values:
     "STATS_WEBHOOK": "", // optional webhook to post stats in
     "LOGGING_WEBHOOK": "", // optional webhook to post logging stuff in
 },
+"TRANSLATE": {
+    "PRIMARY_LANGUAGE": "en", // language code from https://cloud.google.com/translate/docs/languages
+},
 "DATABASE": {
     "DSN": "postgres://dokusei:verysecurepassword@127.0.0.1:5432/dokusei", // replace with whatever password you created
 },

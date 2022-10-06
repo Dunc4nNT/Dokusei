@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+import discord
+
 
 def format_timedelta(time: timedelta) -> str:
     days, remainder = divmod(time.seconds, 86400)
@@ -19,3 +21,9 @@ def format_timedelta(time: timedelta) -> str:
         return f"{minutes_str} and {seconds_str}"
     else:
         return seconds_str
+
+
+def interaction_cooldown_key(
+    interaction: discord.Interaction,
+) -> discord.User | discord.Member:
+    return interaction.user

@@ -7,6 +7,9 @@ base_config = {
         "STATS_WEBHOOK": "",
         "LOGGING_WEBHOOK": "",
     },
+    "TRANSLATE": {
+        "PRIMARY_LANGUAGE": "en",
+    },
     "DATABASE": {
         "DSN": "postgres://dokusei:verysecurepassword@127.0.0.1:5432/dokusei",
     },

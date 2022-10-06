@@ -112,6 +112,8 @@ class DokuseiBot(commands.Bot):
             await interaction.response.send_message(
                 "This command is temporarily disabled.", ephemeral=True
             )
+        elif isinstance(error, app_commands.CommandOnCooldown):
+            await interaction.response.send_message(str(error), ephemeral=True)
         elif isinstance(error, app_commands.MissingRole) or isinstance(
             error, app_commands.MissingAnyRole
         ):
