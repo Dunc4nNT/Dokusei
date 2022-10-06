@@ -14,14 +14,21 @@ import psutil
 from discord import app_commands
 
 from dokusei.utils import format_timedelta
+from dokusei.utils.views.base import BaseView
 
 if TYPE_CHECKING:
     from dokusei import DokuseiBot
 
 
-class BotInfoSelectView(discord.ui.View):
-    def __init__(self, client: DokuseiBot, *, timeout: int = 300):
-        super().__init__(timeout=timeout)
+class BotInfoSelectView(BaseView):
+    def __init__(
+        self,
+        author: discord.User | discord.Member,
+        client: DokuseiBot,
+        *,
+        timeout: int = 300,
+    ):
+        super().__init__(author=author, timeout=timeout)
         self.logger: logging.Logger = logging.getLogger(__name__)
 
         self.add_item(BotInfoSelect(client))
