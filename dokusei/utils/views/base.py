@@ -22,6 +22,9 @@ class BaseView(discord.ui.View):
         )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if await interaction.client.is_owner(interaction.user):  # type: ignore
+            return True
+
         time_left = self.cooldown.update_rate_limit(interaction)
 
         if time_left:

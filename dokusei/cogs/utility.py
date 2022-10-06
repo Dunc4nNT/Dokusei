@@ -7,6 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from dokusei.utils import translate
+from dokusei.utils.checks import CooldownOwnerBypass
 from dokusei.utils.views import TranslateTransformer, TranslationView, translation_embed
 
 if TYPE_CHECKING:
@@ -24,7 +25,7 @@ class Utility(commands.Cog):
     async def cog_unload(self) -> None:
         self.client.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
-    @app_commands.checks.cooldown(1, 30.0, key=lambda i: (i.guild_id, i.user.id))
+    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=30))
     async def translate_ctx_menu(
         self, interaction: discord.Interaction, message: discord.Message
     ) -> None:
@@ -72,7 +73,7 @@ class Utility(commands.Cog):
     utility_group = app_commands.Group(name="utility", description="Utility commands.")
 
     @utility_group.command()
-    @app_commands.checks.cooldown(1, 30.0, key=lambda i: (i.guild_id, i.user.id))
+    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=30))
     async def translate(
         self,
         interaction: discord.Interaction,
