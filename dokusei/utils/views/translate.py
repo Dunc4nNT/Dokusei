@@ -7,7 +7,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from dokusei.resources import LANG_CODES_LINK, LANGUAGES
+from dokusei.resources import LANG_CODES_LINK, LANGUAGES, LANGUAGES_BY_NAME
 from dokusei.utils.errors import ButtonOnCooldown, TransformerError
 from dokusei.utils.translator import translate
 from dokusei.utils.utils import interaction_cooldown_key
@@ -158,9 +158,9 @@ class TranslateTransformer(app_commands.Transformer):
             ][:25]
 
         return [
-            app_commands.Choice(name=language["name"], value=lang_code)
-            for lang_code, language in LANGUAGES.items()
-            if language["name"].lower().startswith(value.lower())
+            app_commands.Choice(name=k, value=v)
+            for k, v in LANGUAGES_BY_NAME.items()
+            if k.lower().startswith(value.lower())
         ][:25]
 
 
