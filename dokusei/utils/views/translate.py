@@ -47,7 +47,7 @@ class TranslationSelect(discord.ui.Select):
         translate_response: TranslateResponse = await translate(
             self.translate_response.source_message,
             self.values[0],
-            interaction.client.session,
+            interaction.client.session,  # type: ignore
         )
 
         embed = await translation_embed(translate_response, self.original_message_link)
