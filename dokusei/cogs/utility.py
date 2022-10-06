@@ -56,6 +56,7 @@ class Utility(commands.Cog):
         await interaction.response.send_message(
             embed=embed,
             view=TranslationView(
+                interaction.user,
                 self.client,
                 source_language_code,
                 source_language,
@@ -107,6 +108,7 @@ class Utility(commands.Cog):
         await interaction.response.send_message(
             embed=embed,
             view=TranslationView(
+                interaction.user,
                 self.client,
                 source_language_code,
                 source_language,

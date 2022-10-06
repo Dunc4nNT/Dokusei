@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class TranslationView(BaseView):
     def __init__(
         self,
+        author: discord.User | discord.Member,
         client: DokuseiBot,
         source_language_code,
         source_language,
@@ -29,7 +30,7 @@ class TranslationView(BaseView):
         *,
         cooldown: float,
     ):
-        super().__init__(cooldown=cooldown)
+        super().__init__(author=author, cooldown=cooldown)
 
         self.add_item(
             TranslationSelect(
