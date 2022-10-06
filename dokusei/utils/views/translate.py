@@ -1,22 +1,20 @@
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
-from discord.ext import commands
 
 from dokusei.resources import LANG_CODES_LINK, LANGUAGES, LANGUAGES_BY_NAME
-from dokusei.utils.errors import ButtonOnCooldown, TransformerError
+from dokusei.utils.errors import TransformerError
 from dokusei.utils.translator import translate
-from dokusei.utils.utils import interaction_cooldown_key
+from dokusei.utils.views.base import BaseView
 
 if TYPE_CHECKING:
     from dokusei import DokuseiBot
 
 
-class TranslationView(discord.ui.View):
+class TranslationView(BaseView):
     def __init__(
         self,
         client: DokuseiBot,
@@ -29,13 +27,9 @@ class TranslationView(discord.ui.View):
         confidence,
         original_message_link="",
         *,
-        timeout: int = 300,
+        cooldown: float,
     ):
-        super().__init__(timeout=timeout)
-        self.logger: logging.Logger = logging.getLogger(__name__)
-        self.cooldown = commands.CooldownMapping.from_cooldown(
-            1, 30.0, interaction_cooldown_key
-        )
+        super().__init__(cooldown=cooldown)
 
         self.add_item(
             TranslationSelect(
@@ -50,29 +44,6 @@ class TranslationView(discord.ui.View):
                 original_message_link,
             )
         )
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        time_left = self.cooldown.update_rate_limit(interaction)
-
-        if time_left:
-            raise ButtonOnCooldown(time_left)
-
-        return True
-
-    async def on_error(
-        self,
-        interaction: discord.Interaction,
-        error: Exception,
-        item: discord.ui.Item,
-    ) -> None:
-        if isinstance(error, ButtonOnCooldown):
-            time_left = round(error.time_left, 2)
-            await interaction.response.send_message(
-                f"You are on cooldown. Try again in {time_left}s",
-                ephemeral=True,
-            )
-        else:
-            return await super().on_error(interaction, error, item)
 
 
 class TranslationSelect(discord.ui.Select):

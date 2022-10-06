@@ -64,6 +64,7 @@ class Utility(commands.Cog):
                 translated_message,
                 confidence,
                 message.jump_url,
+                cooldown=30,
             ),
             ephemeral=True,
         )
@@ -113,6 +114,7 @@ class Utility(commands.Cog):
                 translated_language,
                 translated_message,
                 confidence,
+                cooldown=30,
             ),
         )
 
