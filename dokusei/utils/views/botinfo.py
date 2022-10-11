@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import os
 import platform
 import shutil
@@ -29,17 +28,21 @@ class BotInfoSelectView(BaseView):
         timeout: int = 300,
     ):
         super().__init__(author=author, timeout=timeout)
-        self.logger: logging.Logger = logging.getLogger(__name__)
 
         self.add_item(BotInfoSelect(client))
         self.add_item(
             discord.ui.Button(
                 label="Invite",
                 url=f"https://discord.com/oauth2/authorize?client_id={client.user.id}&scope=bot&permissions=8",
+                style=discord.ButtonStyle.link,
             )
         )
         self.add_item(
-            discord.ui.Button(label="Website", url=client.config["LINKS"]["WEBSITE"])
+            discord.ui.Button(
+                label="Website",
+                url=client.config["LINKS"]["WEBSITE"],
+                style=discord.ButtonStyle.link,
+            )
         )
 
 
