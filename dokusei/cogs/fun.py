@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from urllib.parse import quote_plus
 
 import discord
 from discord import app_commands
@@ -49,6 +50,12 @@ class Fun(commands.Cog):
         await interaction.response.send_message(
             embed=embed, view=ImportView(interaction.user)
         )
+
+    @fun_group.command()
+    async def lmgtfy(self, interaction: discord.Interaction, *, query: str) -> None:
+        """Let Me Google That For You."""
+        url = f"https://letmegooglethat.com/?q={quote_plus(query)}"
+        await interaction.response.send_message(content=url)
 
 
 async def setup(client: DokuseiBot):
