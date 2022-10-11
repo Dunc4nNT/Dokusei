@@ -41,7 +41,12 @@ class TranslationSelect(discord.ui.Select):
             for language_code in LANGUAGES
             if LANGUAGES[language_code]["top"] is True
         ][:25]
-        super().__init__(min_values=1, max_values=1, options=options)
+        super().__init__(
+            min_values=1,
+            max_values=1,
+            options=options,
+            placeholder="Select a different language",
+        )
 
     async def callback(self, interaction: discord.Interaction) -> None:
         translate_response: TranslateResponse = await translate(

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from dokusei import DokuseiBot
 
 
-class BotInfoSelectView(BaseView):
+class BotInfoView(BaseView):
     def __init__(
         self,
         author: discord.User | discord.Member,
@@ -63,7 +63,12 @@ class BotInfoSelect(discord.ui.Select):
                 value="1",
             ),
         ]
-        super().__init__(min_values=1, max_values=1, options=options)
+        super().__init__(
+            min_values=1,
+            max_values=1,
+            options=options,
+            placeholder="Select other information",
+        )
 
     async def callback(self, interaction: discord.Interaction) -> None:
         match self.values[0]:
@@ -187,7 +192,6 @@ async def system_info_embed(client: DokuseiBot) -> discord.Embed:
         name="System",
         value=f"```yml\n"
         f"OS: {uname.system}\n"
-        f"Name: {uname.node}\n"
         f"Machine: {uname.machine}\n"
         f"Uptime: {system_uptime}```",
         inline=False,

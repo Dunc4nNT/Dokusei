@@ -58,7 +58,12 @@ class ImportSelect(discord.ui.Select):
             discord.SelectOption(label=key, description=f"Import {key}.", value=key)
             for key in IMPORTS.keys()
         ][:25]
-        super().__init__(min_values=1, max_values=1, options=options)
+        super().__init__(
+            min_values=1,
+            max_values=1,
+            options=options,
+            placeholder="from dokusei.utils.views.fun import ImportSelect",
+        )
 
     async def callback(self, interaction: discord.Interaction) -> None:
         embed = await import_embed(self.values[0])
