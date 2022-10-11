@@ -29,6 +29,7 @@ class Utility(commands.Cog):
     async def translate_ctx_menu(
         self, interaction: discord.Interaction, message: discord.Message
     ) -> None:
+        """Translate a message using context menus."""
         translate_response = await translate(
             message.content,
             self.client.config["TRANSLATE"]["PRIMARY_LANGUAGE"],
@@ -59,6 +60,7 @@ class Utility(commands.Cog):
         *,
         message: str,
     ) -> None:
+        """Translate a message to the given language."""
         translate_response = await translate(message, language, self.client.session)
 
         embed = await translation_embed(translate_response)

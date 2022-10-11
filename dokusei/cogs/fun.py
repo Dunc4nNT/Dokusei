@@ -7,7 +7,13 @@ from discord import app_commands
 from discord.ext import commands
 
 from dokusei.utils.checks import CooldownOwnerBypass
-from dokusei.utils.views.fun import CoinflipView, coinflip_embed
+from dokusei.utils.views.fun import (
+    CoinflipView,
+    ImportTransformer,
+    ImportView,
+    coinflip_embed,
+    import_embed,
+)
 
 if TYPE_CHECKING:
     from dokusei import DokuseiBot
@@ -28,6 +34,20 @@ class Fun(commands.Cog):
         await interaction.response.send_message(
             embed=embed,
             view=CoinflipView(interaction.user, cooldown=1),
+        )
+
+    @fun_group.command(name="import")
+    async def importthis(
+        self,
+        interaction: discord.Interaction,
+        *,
+        module: app_commands.Transform[str, ImportTransformer],
+    ) -> None:
+        """Import this"""
+        embed = await import_embed(module)
+
+        await interaction.response.send_message(
+            embed=embed, view=ImportView(interaction.user)
         )
 
 

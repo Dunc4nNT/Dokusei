@@ -13,7 +13,7 @@ class BaseView(discord.ui.View):
         self,
         author: discord.User | discord.Member,
         *,
-        cooldown: float = 10,
+        cooldown: float = 3,
         timeout: int = 300,
     ):
         super().__init__(timeout=timeout)
