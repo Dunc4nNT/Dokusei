@@ -44,7 +44,10 @@ class Fun(commands.Cog):
         *,
         module: app_commands.Transform[str, ImportTransformer],
     ) -> None:
-        """Import this"""
+        """Import this
+
+        :param module: the module to import
+        """
         embed = await import_embed(module)
 
         await interaction.response.send_message(
@@ -53,7 +56,10 @@ class Fun(commands.Cog):
 
     @fun_group.command()
     async def lmgtfy(self, interaction: discord.Interaction, *, query: str) -> None:
-        """Let Me Google That For You."""
+        """Let Me Google That For You.
+
+        :param query: what to google
+        """
         url = f"https://letmegooglethat.com/?q={quote_plus(query)}"
         await interaction.response.send_message(content=url)
 
