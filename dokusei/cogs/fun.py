@@ -20,7 +20,7 @@ class Fun(commands.Cog):
     fun_group = app_commands.Group(name="fun", description="Fun commands.")
 
     @fun_group.command()
-    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=30))
+    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=1))
     async def coinflip(self, interaction: discord.Interaction) -> None:
         """Flips a coin."""
         embed = await coinflip_embed()
