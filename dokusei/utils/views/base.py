@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 
 import discord
 from discord.ext import commands
@@ -12,17 +12,28 @@ class BaseView(discord.ui.View):
     def __init__(
         self,
         author: discord.User | discord.Member,
-        *,
-        cooldown: float = 3,
-        timeout: int = 300,
+        original_interaction: discord.Interaction,
+        cooldown: float = 0,
+        timeout: Optional[float] = 180,
     ):
         super().__init__(timeout=timeout)
 
         self.author = author
         self.logger: logging.Logger = logging.getLogger(__name__)
+        self.original_interaction = original_interaction
         self.cooldown = commands.CooldownMapping.from_cooldown(
             1, cooldown, interaction_cooldown_key
         )
+
+    async def on_timeout(self) -> None:
+        for item in self.children:
+            if isinstance(item, discord.ui.Button):
+                if item.url:
+                    continue
+
+            self.remove_item(item)
+
+        await self.original_interaction.edit_original_response(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if await interaction.client.is_owner(interaction.user):  # type: ignore

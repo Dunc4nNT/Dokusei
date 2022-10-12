@@ -71,7 +71,12 @@ class Informatic(commands.Cog):
         """Displays some info about the bot."""
         embed = await client_info_embed(self.client)
         await interaction.response.send_message(
-            embed=embed, view=BotInfoView(interaction.user, self.client)
+            embed=embed,
+            view=BotInfoView(
+                author=interaction.user,
+                interaction=interaction,
+                client=self.client,
+            ),
         )
 
 

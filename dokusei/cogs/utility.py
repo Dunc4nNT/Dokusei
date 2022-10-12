@@ -44,9 +44,10 @@ class Utility(commands.Cog):
         await interaction.response.send_message(
             embed=embed,
             view=TranslationView(
-                interaction.user,
-                translate_response,
-                message.jump_url,
+                author=interaction.user,
+                interaction=interaction,
+                translate_response=translate_response,
+                original_message_link=message.jump_url,
                 cooldown=30,
             ),
             ephemeral=True,
@@ -73,7 +74,12 @@ class Utility(commands.Cog):
 
         await interaction.response.send_message(
             embed=embed,
-            view=TranslationView(interaction.user, translate_response, cooldown=30),
+            view=TranslationView(
+                author=interaction.user,
+                interaction=interaction,
+                translate_response=translate_response,
+                cooldown=30,
+            ),
         )
 
 

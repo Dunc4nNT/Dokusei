@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 from collections import Counter
+from typing import Optional
 
 import discord
 from discord import app_commands
@@ -16,9 +17,16 @@ class CoinflipView(BaseView):
     def __init__(
         self,
         author: discord.User | discord.Member,
-        cooldown: float,
+        interaction: discord.Interaction,
+        cooldown: float = 0,
+        timeout: Optional[float] = 180,
     ):
-        super().__init__(author=author, cooldown=cooldown)
+        super().__init__(
+            author=author,
+            original_interaction=interaction,
+            cooldown=cooldown,
+            timeout=timeout,
+        )
 
         self.add_item(
             FlipAgainButton(
@@ -46,8 +54,19 @@ async def coinflip_embed() -> discord.Embed:
 
 
 class ImportView(BaseView):
-    def __init__(self, author: discord.User | discord.Member):
-        super().__init__(author=author)
+    def __init__(
+        self,
+        author: discord.User | discord.Member,
+        interaction: discord.Interaction,
+        cooldown: float = 0,
+        timeout: Optional[float] = 180,
+    ):
+        super().__init__(
+            author=author,
+            original_interaction=interaction,
+            cooldown=cooldown,
+            timeout=timeout,
+        )
 
         self.add_item(ImportSelect())
 
@@ -111,11 +130,19 @@ class DiceRollView(BaseView):
     def __init__(
         self,
         author: discord.User | discord.Member,
+        interaction: discord.Interaction,
         sides: int,
         quantity: int,
         result: Counter[int],
+        cooldown: float = 0,
+        timeout: Optional[float] = 180,
     ) -> None:
-        super().__init__(author=author)
+        super().__init__(
+            author=author,
+            original_interaction=interaction,
+            cooldown=cooldown,
+            timeout=timeout,
+        )
         self.sides = sides
         self.quantity = quantity
         self.result = result
@@ -172,6 +199,7 @@ class DiceRollSelect(discord.ui.Select):
             embed=embed,
             view=DiceRollView(
                 author=interaction.user,
+                interaction=interaction,
                 sides=int(self.values[0]),
                 quantity=self.quantity,
                 result=result,
@@ -195,6 +223,7 @@ class DiceRollRepeatButton(discord.ui.Button):
             embed=embed,
             view=DiceRollView(
                 author=interaction.user,
+                interaction=interaction,
                 sides=self.sides,
                 quantity=self.quantity,
                 result=result,

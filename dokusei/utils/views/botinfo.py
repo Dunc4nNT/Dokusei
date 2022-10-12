@@ -5,7 +5,7 @@ import platform
 import shutil
 import sys
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import asyncpg
 import discord
@@ -23,11 +23,17 @@ class BotInfoView(BaseView):
     def __init__(
         self,
         author: discord.User | discord.Member,
+        interaction: discord.Interaction,
         client: DokuseiBot,
-        *,
-        timeout: int = 300,
+        cooldown: float = 0,
+        timeout: Optional[float] = 180,
     ):
-        super().__init__(author=author, timeout=timeout)
+        super().__init__(
+            author=author,
+            original_interaction=interaction,
+            cooldown=cooldown,
+            timeout=timeout,
+        )
 
         self.add_item(BotInfoSelect(client))
         self.add_item(

@@ -32,14 +32,16 @@ class Fun(commands.Cog):
     fun_group = app_commands.Group(name="fun", description="Fun commands.")
 
     @fun_group.command()
-    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=1))
+    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=3))
     async def coinflip(self, interaction: discord.Interaction) -> None:
         """Flips a coin."""
         embed = await coinflip_embed()
 
         await interaction.response.send_message(
             embed=embed,
-            view=CoinflipView(interaction.user, cooldown=1),
+            view=CoinflipView(
+                author=interaction.user, interaction=interaction, cooldown=3
+            ),
         )
 
     @fun_group.command(name="import")
@@ -55,7 +57,8 @@ class Fun(commands.Cog):
         embed = await import_embed(module)
 
         await interaction.response.send_message(
-            embed=embed, view=ImportView(interaction.user)
+            embed=embed,
+            view=ImportView(author=interaction.user, interaction=interaction),
         )
 
     @fun_group.command()
@@ -84,6 +87,7 @@ class Fun(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @fun_group.command()
+    @app_commands.checks.dynamic_cooldown(CooldownOwnerBypass(rate=1, per=3))
     async def diceroll(
         self,
         interaction: discord.Interaction,
@@ -99,7 +103,7 @@ class Fun(commands.Cog):
         embed = await diceroll_embed(sides, quantity, result)  # type: ignore - it has a default
         await interaction.response.send_message(
             embed=embed,
-            view=DiceRollView(author=interaction.user, sides=sides, quantity=quantity, result=result),  # type: ignore - it has a default
+            view=DiceRollView(author=interaction.user, interaction=interaction, sides=sides, quantity=quantity, result=result, cooldown=3),  # type: ignore - it has a default
         )
 
 

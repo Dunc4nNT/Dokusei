@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import discord
 from discord import app_commands
 
@@ -13,12 +15,18 @@ class TranslationView(BaseView):
     def __init__(
         self,
         author: discord.User | discord.Member,
+        interaction: discord.Interaction,
         translate_response: TranslateResponse,
         original_message_link: str = "",
-        *,
-        cooldown: float,
+        cooldown: float = 0,
+        timeout: Optional[float] = 180,
     ):
-        super().__init__(author=author, cooldown=cooldown)
+        super().__init__(
+            author=author,
+            original_interaction=interaction,
+            cooldown=cooldown,
+            timeout=timeout,
+        )
 
         self.add_item(TranslationSelect(translate_response, original_message_link))
 
