@@ -106,6 +106,21 @@ class Fun(commands.Cog):
             view=DiceRollView(author=interaction.user, interaction=interaction, sides=sides, quantity=quantity, result=result, cooldown=3),  # type: ignore - it has a default
         )
 
+    @fun_group.command()
+    async def mock(self, interaction: discord.Interaction, message: str) -> None:
+        """MoCk A mEsSaGe.
+
+        :param message: content to mock
+        """
+        mock_msg = ""
+        for char in message:
+            if random.getrandbits(1):
+                mock_msg += char.lower()
+            else:
+                mock_msg += char.upper()
+
+        await interaction.response.send_message(content=mock_msg)
+
 
 async def setup(client: DokuseiBot):
     await client.add_cog(Fun(client))
