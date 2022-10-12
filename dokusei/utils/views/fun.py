@@ -35,14 +35,12 @@ class FlipAgainButton(discord.ui.Button):
 async def coinflip_embed() -> discord.Embed:
     result = random.choice(["Heads", "Tails"])
 
-    embed = discord.Embed(
+    return discord.Embed(
         title="Coinflip",
         description=f"The coin landed on **{result}**.",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )
-
-    return embed
 
 
 class ImportView(BaseView):
@@ -99,11 +97,9 @@ class ImportTransformer(app_commands.Transformer):
 
 
 async def import_embed(module: str) -> discord.Embed:
-    embed = discord.Embed(
+    return discord.Embed(
         title=f"Import {module}",
         description=f"```\n{IMPORTS[module]}```",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )
-
-    return embed

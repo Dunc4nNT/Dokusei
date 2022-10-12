@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING
 from urllib.parse import quote_plus
 
@@ -7,6 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from dokusei.resources.eightball import RESPONSES
 from dokusei.utils.checks import CooldownOwnerBypass
 from dokusei.utils.views.fun import (
     CoinflipView,
@@ -62,6 +64,24 @@ class Fun(commands.Cog):
         """
         url = f"https://letmegooglethat.com/?q={quote_plus(query)}"
         await interaction.response.send_message(content=url)
+
+    @fun_group.command()
+    async def eightball(
+        self, interaction: discord.Interaction, *, question: str
+    ) -> None:
+        """Ask eightball a yes/no question.
+
+        :param question: the question you have
+        """
+        embed = discord.Embed(
+            title="Magic 8 Ball",
+            description=f"**Question**: {question}\n"
+            f"**Answer**: {random.choice(RESPONSES)}",
+            colour=0x3F3368,
+            timestamp=discord.utils.utcnow(),
+        )
+
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(client: DokuseiBot):
