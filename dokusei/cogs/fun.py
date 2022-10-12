@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from urllib.parse import quote_plus
 
 import discord
@@ -10,11 +10,14 @@ from discord.ext import commands
 
 from dokusei.resources.eightball import RESPONSES
 from dokusei.utils.checks import CooldownOwnerBypass
+from dokusei.utils.utils import roll_die
 from dokusei.utils.views.fun import (
     CoinflipView,
+    DiceRollView,
     ImportTransformer,
     ImportView,
     coinflip_embed,
+    diceroll_embed,
     import_embed,
 )
 
@@ -43,7 +46,6 @@ class Fun(commands.Cog):
     async def importthis(
         self,
         interaction: discord.Interaction,
-        *,
         module: app_commands.Transform[str, ImportTransformer],
     ) -> None:
         """Import this
@@ -57,7 +59,7 @@ class Fun(commands.Cog):
         )
 
     @fun_group.command()
-    async def lmgtfy(self, interaction: discord.Interaction, *, query: str) -> None:
+    async def lmgtfy(self, interaction: discord.Interaction, query: str) -> None:
         """Let Me Google That For You.
 
         :param query: what to google
@@ -66,9 +68,7 @@ class Fun(commands.Cog):
         await interaction.response.send_message(content=url)
 
     @fun_group.command()
-    async def eightball(
-        self, interaction: discord.Interaction, *, question: str
-    ) -> None:
+    async def eightball(self, interaction: discord.Interaction, question: str) -> None:
         """Ask eightball a yes/no question.
 
         :param question: the question you have
@@ -82,6 +82,25 @@ class Fun(commands.Cog):
         )
 
         await interaction.response.send_message(embed=embed)
+
+    @fun_group.command()
+    async def diceroll(
+        self,
+        interaction: discord.Interaction,
+        sides: Optional[app_commands.Range[int, 3, 120]] = 6,
+        quantity: Optional[app_commands.Range[int, 1, 1000]] = 1,
+    ) -> None:
+        """Roll a die.
+
+        :param sides: amount of sides the die has, 3 <= sides <= 120, default 6
+        :param quantity: amount of die to roll, 1 <= quantity <= 1000, default 1
+        """
+        result = roll_die(sides, quantity)  # type: ignore - it has a default
+        embed = await diceroll_embed(sides, quantity, result)  # type: ignore - it has a default
+        await interaction.response.send_message(
+            embed=embed,
+            view=DiceRollView(author=interaction.user, sides=sides, quantity=quantity, result=result),  # type: ignore - it has a default
+        )
 
 
 async def setup(client: DokuseiBot):

@@ -60,7 +60,6 @@ class Utility(commands.Cog):
         self,
         interaction: discord.Interaction,
         language: app_commands.Transform[str, TranslateTransformer],
-        *,
         message: str,
     ) -> None:
         """Translate a message to the given language.

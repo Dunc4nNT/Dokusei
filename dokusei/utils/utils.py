@@ -1,3 +1,5 @@
+import random
+from collections import Counter
 from datetime import timedelta
 
 import discord
@@ -27,3 +29,11 @@ def interaction_cooldown_key(
     interaction: discord.Interaction,
 ) -> discord.User | discord.Member:
     return interaction.user
+
+
+def roll_die(sides: int, quantity: int) -> Counter[int]:
+    counter: Counter[int] = Counter()
+    for _ in range(quantity):
+        counter[random.randint(1, sides)] += 1
+
+    return counter
