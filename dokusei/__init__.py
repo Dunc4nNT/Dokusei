@@ -1,2 +1,1 @@
-from dokusei.client import *
-from dokusei.config_manager import *
+from dokusei.client import DokuseiBot

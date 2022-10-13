@@ -5,7 +5,7 @@ from typing import Optional
 import discord
 from discord import app_commands
 
-from dokusei.resources import LANG_CODES_LINK, LANGUAGES, LANGUAGES_BY_NAME
+from dokusei.resources.languages import LANG_CODES_LINK, LANGUAGES, LANGUAGES_BY_NAME
 from dokusei.utils.errors import TransformerError
 from dokusei.utils.translator import TranslateResponse, translate
 from dokusei.utils.views.base import BaseView

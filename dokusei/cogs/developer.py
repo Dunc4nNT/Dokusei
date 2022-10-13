@@ -15,11 +15,11 @@ class Developer(commands.Cog):
         self.client: DokuseiBot = client
         self.logger: logging.Logger = logging.getLogger(__name__)
 
-    async def cog_check(self, ctx: commands.Context) -> bool:
+    async def cog_check(self, ctx: commands.Context[DokuseiBot]) -> bool:
         return await self.client.is_owner(ctx.author)
 
     @commands.command()
-    async def shutdown(self, ctx: commands.Context):
+    async def shutdown(self, ctx: commands.Context[DokuseiBot]) -> None:
         """Shuts the bot down."""
         await ctx.send("Attempting to shut down cleanly...")
         self.logger.info("Shutdown: Manual")
@@ -29,12 +29,12 @@ class Developer(commands.Cog):
     @commands.command()
     async def load(
         self,
-        ctx: commands.Context,
+        ctx: commands.Context[DokuseiBot],
         *,
         module: str = commands.parameter(
             description="The module to load",
         ),
-    ):
+    ) -> None:
         """Loads the specified module."""
         try:
             await self.client.load_extension(f"dokusei.cogs.{module}")
@@ -46,12 +46,12 @@ class Developer(commands.Cog):
     @commands.command()
     async def unload(
         self,
-        ctx: commands.Context,
+        ctx: commands.Context[DokuseiBot],
         *,
         module: str = commands.parameter(
             description="The module to unload",
         ),
-    ):
+    ) -> None:
         """Unloads the specified module."""
         try:
             await self.client.unload_extension(f"dokusei.cogs.{module}")
@@ -63,13 +63,13 @@ class Developer(commands.Cog):
     @commands.command()
     async def reload(
         self,
-        ctx: commands.Context,
+        ctx: commands.Context[DokuseiBot],
         *,
         module: str = commands.parameter(
             default=None,
             description="The module to reload, reloads all if nothing is specified",
         ),
-    ):
+    ) -> None:
         """Reloads the specified module, reload everything if no module is specified."""
         if module:
             try:
@@ -88,7 +88,7 @@ class Developer(commands.Cog):
             await ctx.send("Reloaded all modules.")
 
     @commands.command()
-    async def modules(self, ctx: commands.Context):
+    async def modules(self, ctx: commands.Context[DokuseiBot]) -> None:
         """Shows all the loaded modules."""
         await ctx.send(
             f"""The loaded modules are: {', '.join(f"`{ext.replace('dokusei.cogs.', '')}`" for ext in self.client.extensions.keys())}."""
@@ -98,7 +98,7 @@ class Developer(commands.Cog):
     @commands.guild_only()
     async def sync(
         self,
-        ctx: commands.Context,
+        ctx: commands.Context[DokuseiBot],
         guilds: commands.Greedy[discord.Object] = commands.parameter(
             default=None, description="Guild IDs to sync, separated by space"
         ),

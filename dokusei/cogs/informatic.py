@@ -6,8 +6,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from dokusei.utils import format_timedelta
-from dokusei.utils.views import BotInfoView, client_info_embed
+from dokusei.utils.utils import format_timedelta
+from dokusei.utils.views.botinfo import BotInfoView, client_info_embed
 
 if TYPE_CHECKING:
     from dokusei import DokuseiBot

@@ -153,7 +153,7 @@ class DiceRollView(BaseView):
 
 
 class DiceRollSelect(discord.ui.Select):
-    def __init__(self, quantity) -> None:
+    def __init__(self, quantity: int) -> None:
         options = [
             discord.SelectOption(
                 label=str(x),

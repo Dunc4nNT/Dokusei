@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Annotated, Optional
 from urllib.parse import quote_plus
 
 import discord
@@ -91,19 +91,26 @@ class Fun(commands.Cog):
     async def diceroll(
         self,
         interaction: discord.Interaction,
-        sides: Optional[app_commands.Range[int, 3, 120]] = 6,
-        quantity: Optional[app_commands.Range[int, 1, 1000]] = 1,
+        sides: Annotated[int, Optional[app_commands.Range[int, 3, 120]]] = 6,
+        quantity: Annotated[int, Optional[app_commands.Range[int, 1, 1000]]] = 1,
     ) -> None:
         """Roll a die.
 
         :param sides: amount of sides the die has, 3 <= sides <= 120, default 6
         :param quantity: amount of die to roll, 1 <= quantity <= 1000, default 1
         """
-        result = roll_die(sides, quantity)  # type: ignore - it has a default
-        embed = await diceroll_embed(sides, quantity, result)  # type: ignore - it has a default
+        result = roll_die(sides, quantity)
+        embed = await diceroll_embed(sides, quantity, result)
         await interaction.response.send_message(
             embed=embed,
-            view=DiceRollView(author=interaction.user, interaction=interaction, sides=sides, quantity=quantity, result=result, cooldown=3),  # type: ignore - it has a default
+            view=DiceRollView(
+                author=interaction.user,
+                interaction=interaction,
+                sides=sides,
+                quantity=quantity,
+                result=result,
+                cooldown=3,
+            ),
         )
 
     @fun_group.command()

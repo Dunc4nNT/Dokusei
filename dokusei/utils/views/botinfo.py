@@ -12,7 +12,7 @@ import discord
 import psutil
 from discord import app_commands
 
-from dokusei.utils import format_timedelta
+from dokusei.utils.utils import format_timedelta
 from dokusei.utils.views.base import BaseView
 
 if TYPE_CHECKING:
@@ -108,7 +108,7 @@ async def client_info_embed(client: DokuseiBot) -> discord.Embed:
         name="Information",
         value=f"```yml\n"
         f"Uptime: {td}\n"
-        f"Latency: {round(client.latency * 1000)}ms\n"
+        f"Latency: {round(client.latency * 1000)} ms\n"
         f"RAM in use: {memory} MiB```",
         inline=False,
     )
@@ -223,6 +223,8 @@ async def system_info_embed(client: DokuseiBot) -> discord.Embed:
     )
 
     disk_io = psutil.disk_io_counters()
+    read = round(disk_io.read_bytes / 2**30, 1) if disk_io else "?"
+    write = round(disk_io.write_bytes / 2**30, 1) if disk_io else "?"
     total, used, free = shutil.disk_usage("/")
     total_gib = total / 2**30
     used_gib = used / 2**30
@@ -232,8 +234,8 @@ async def system_info_embed(client: DokuseiBot) -> discord.Embed:
         value=f"```yml\n"
         f"Size: {round(total_gib, 1)} GiB\n"
         f"Used: {round(used_gib, 1)} GiB ({round(used_gib / total_gib * 100, 1)}%)\n\n"
-        f"Read: {round(disk_io.read_bytes / 2 ** 30, 1)} GiB\n"
-        f"Write: {round(disk_io.write_bytes / 2 ** 30, 1)} GiB```",
+        f"Read: {read} GiB\n"
+        f"Write: {write} GiB```",
     )
 
     net_io = psutil.net_io_counters()
