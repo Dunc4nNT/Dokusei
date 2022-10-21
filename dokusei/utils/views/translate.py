@@ -99,7 +99,7 @@ async def translation_embed(
 ) -> discord.Embed:
     return discord.Embed(
         title="Translation",
-        description=f"Translated [a message]({original_message_link}) from {LANGUAGES[translate_response.source_language_code]['flag']} {translate_response.source_language} ({translate_response.confidence*100}% confidence) to {LANGUAGES[translate_response.translated_language_code]['flag']} {translate_response.translated_language}.\n\n```\n{translate_response.translated_message}```",
+        description=f"Translated [a message]({original_message_link}) from {LANGUAGES[translate_response.source_language_code]['flag']} {translate_response.source_language} ({round(translate_response.confidence*100, 1)}% confidence) to {LANGUAGES[translate_response.translated_language_code]['flag']} {translate_response.translated_language}.\n\n```\n{translate_response.translated_message}```",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )
