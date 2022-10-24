@@ -1,6 +1,8 @@
 import random
 from collections import Counter
 from datetime import timedelta
+from enum import Enum
+from typing import Literal, NamedTuple
 
 import discord
 
@@ -37,3 +39,19 @@ def roll_die(sides: int, quantity: int) -> Counter[int]:
         counter[random.randint(1, sides)] += 1
 
     return counter
+
+
+class VersionInfo(NamedTuple):
+    major: int
+    minor: int
+    micro: int
+    releaselevel: Literal["alpha", "beta", "candidate", "final"]
+    serial: int
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}.{self.micro}{self.releaselevel[0] if self.releaselevel != 'final' else ''}"
+
+
+class RunMode(Enum):
+    DEVELOPMENT = 1
+    PRODUCTION = 2

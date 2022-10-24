@@ -46,7 +46,7 @@ class BotInfoView(BaseView):
         self.add_item(
             discord.ui.Button(
                 label="Website",
-                url=client.config["LINKS"]["WEBSITE"],
+                url=client.config["links"]["website"],
                 style=discord.ButtonStyle.link,
             )
         )
@@ -91,10 +91,10 @@ class BotInfoSelect(discord.ui.Select):
 async def client_info_embed(client: DokuseiBot) -> discord.Embed:
     embed = discord.Embed(
         title="Client Information",
-        description=f"[Documentation]({client.config['LINKS']['DOCS']}) • "
-        f"[Dashboard]({client.config['LINKS']['DASHBOARD']}) • "
-        f"[Support]({client.config['LINKS']['SUPPORT']}) • "
-        f"[Source Code]({client.config['LINKS']['REPO']})",
+        description=f"[Documentation]({client.config['links']['docs']}) • "
+        f"[Dashboard]({client.config['links']['dashboard']}) • "
+        f"[Support]({client.config['links']['support']}) • "
+        f"[Source Code]({client.config['links']['repository']})",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )
@@ -167,7 +167,7 @@ async def client_info_embed(client: DokuseiBot) -> discord.Embed:
     embed.add_field(
         name="Version Info",
         value=f"```yml\n"
-        f"Dokusei: {client.config['DEV']['VERSION']}\n"
+        f"Dokusei: {client.config['dev']['version']}\n"
         f"Python: {py_version.major}.{py_version.minor}.{py_version.micro}\n"
         f"Discord.py: {discord_ver_info.major}.{discord_ver_info.minor}.{discord_ver_info.micro}\n"
         f"Asyncpg: {asyncpg.__version__}```",

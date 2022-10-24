@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import logging.handlers
+import time
 from pathlib import Path
 
 import aiohttp
@@ -9,6 +10,7 @@ import discord
 
 from config import config
 from dokusei import DokuseiBot
+from dokusei.utils.config_manager import RunMode
 
 
 async def setup_logging() -> None:
@@ -19,7 +21,7 @@ async def setup_logging() -> None:
     discord.utils.setup_logging()
     logging.getLogger("discord").setLevel(logging.INFO)
 
-    if config["DEV"]["MODE"] == "development":
+    if config["dev"]["mode"] == RunMode.DEVELOPMENT:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
@@ -30,6 +32,7 @@ async def setup_logging() -> None:
     formatter = logging.Formatter(
         "[{asctime}] [{levelname:<8}] {name}: {message}", "%Y-%m-%d %H:%M:%S", style="{"
     )
+    formatter.converter = time.gmtime
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
@@ -48,17 +51,22 @@ async def main() -> None:
     ]
 
     async with aiohttp.ClientSession() as session, asyncpg.create_pool(
-        dsn=config["DATABASE"]["DSN"], command_timeout=30
+        host=config["database"]["host"],
+        port=config["database"]["port"],
+        user=config["database"]["user"],
+        password=config["database"]["password"],
+        database=config["database"]["database"],
+        command_timeout=30,
     ) as pool:
         async with DokuseiBot(
-            description=config["BOT"]["DESCRIPTION"],
+            description=config["bot"]["description"],
             intents=intents,
             initial_extensions=initial_extensions,
             session=session,
             db_pool=pool,
             config=config,
         ) as client:
-            await client.start(config["BOT"]["TOKEN"])
+            await client.start(config["bot"]["token"])
 
 
 if __name__ == "__main__":

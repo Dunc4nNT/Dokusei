@@ -1,30 +1,34 @@
-import configparser
+from dokusei.utils.config_manager import Config
+from dokusei.utils.utils import RunMode, VersionInfo
 
-base_config = {
-    "BOT": {
-        "TOKEN": "",
-        "DESCRIPTION": "Personal Discord Bot",
-        "STATS_WEBHOOK": "",
-        "LOGGING_WEBHOOK": "",
+config: Config = {
+    "bot": {
+        "token": "",
+        "description": "Personal Discord Bot",
+        "logging_webhook": "",
+        "stats_webhook": "",
     },
-    "TRANSLATE": {
-        "PRIMARY_LANGUAGE": "en",
+    "translate": {
+        "primary_language": "en",
     },
-    "DATABASE": {
-        "DSN": "postgres://dokusei:verysecurepassword@127.0.0.1:5432/dokusei",
+    "database": {
+        "host": "127.0.0.1",
+        "port": 5432,
+        "user": "dokusei",
+        "password": "verysecurepassword",
+        "database": "dokusei",
     },
-    "LINKS": {
-        "REPO": "https://github.com/Dunc4nNT/Dokusei",
-        "WEBSITE": "https://dunc4nnt.github.io/Dokusei-Website/",
-        "DOCS": "https://dunc4nnt.github.io/Dokusei-Docs/",
-        "DASHBOARD": "https://dunc4nnt.github.io/Dokusei-Dashboard/",
-        "SUPPORT": "soon™",
+    "links": {
+        "repository": "https://github.com/Dunc4nNT/Dokusei",
+        "website": "https://dunc4nnt.github.io/Dokusei-Website/",
+        "docs": "https://dunc4nnt.github.io/Dokusei-Docs/",
+        "dashboard": "https://dunc4nnt.github.io/Dokusei-Dashboard/",
+        "support": "soon™",
     },
-    "DEV": {
-        "MODE": "development",  # development/production
-        "VERSION": "0.0.1",
+    "dev": {
+        "mode": RunMode.PRODUCTION,
+        "version": VersionInfo(
+            major=0, minor=0, micro=1, releaselevel="alpha", serial=0
+        ),
     },
 }
-
-config = configparser.ConfigParser(interpolation=None)
-config.read_dict(base_config)

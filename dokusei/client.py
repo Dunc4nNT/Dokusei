@@ -1,13 +1,16 @@
-import configparser
+import asyncio
 import logging
+import textwrap
+from datetime import datetime
 from typing import Any
 
 import aiohttp
 import asyncpg
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
+from dokusei.utils.config_manager import Config
 from dokusei.utils.errors import TransformerError
 
 
@@ -19,7 +22,7 @@ class DokuseiBot(commands.Bot):
         initial_extensions: list[str],
         session: aiohttp.ClientSession,
         db_pool: asyncpg.Pool,
-        config: configparser.ConfigParser,
+        config: Config,
         *args: Any,
         **kwargs: Any,
     ):
@@ -29,8 +32,15 @@ class DokuseiBot(commands.Bot):
         self.db_pool = db_pool
         self.config = config
         self.global_logger = logging.getLogger(__name__)
+        self.logging_handler = DokuseiLogger(self)
+        logging.getLogger().addHandler(self.logging_handler)
+        self._logging_queue = asyncio.Queue()
+        self.logging_webhook = discord.Webhook.from_url(
+            self.config["bot"]["logging_webhook"], session=self.session
+        )
 
     async def setup_hook(self) -> None:
+        self.send_log_record.start()
         self.tree.on_error = self.on_app_command_error
         self.app_info = await self.application_info()
         self.owner_id = self.app_info.owner.id
@@ -135,6 +145,43 @@ class DokuseiBot(commands.Bot):
             self.global_logger.error(
                 "Ignoring exception in interaction.", exc_info=error
             )
+
+    def add_log_record(self, record: logging.LogRecord) -> None:
+        self._logging_queue.put_nowait(record)
+
+    @tasks.loop(seconds=0)
+    async def send_log_record(self) -> None:
+        record: logging.LogRecord = await self._logging_queue.get()
+
+        emojis = {
+            "DEBUG": "🔧",
+            "INFO": "ℹ️",
+            "WARNING": "⚠️",
+            "ERROR": "❗",
+            "CRITICAL": "‼️",
+        }
+        log_time = datetime.utcfromtimestamp(record.created).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        message = textwrap.shorten(
+            f"{emojis.get(record.levelname, '🤷')}`{log_time}` **{record.name}** {record.message}",
+            2000,
+        )
+
+        await self.logging_webhook.send(
+            message,
+            username=f"{self.user.display_name} Logging",
+            avatar_url=self.user.display_avatar,
+        )
+
+
+class DokuseiLogger(logging.Handler):
+    def __init__(self, client: DokuseiBot) -> None:
+        super().__init__(logging.INFO)
+        self.client = client
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.client.add_log_record(record)
 
 
 def _get_prefix(client: DokuseiBot, message: discord.Message):

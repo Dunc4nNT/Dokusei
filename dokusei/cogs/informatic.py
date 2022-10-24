@@ -32,28 +32,28 @@ class Informatic(commands.Cog):
     async def dashboard(self, interaction: discord.Interaction) -> None:
         """Sends a link to the dashboard."""
         await interaction.response.send_message(
-            f"Dashboard: {self.client.config['LINKS']['DASHBOARD']}"
+            f"Dashboard: {self.client.config['links']['dashboard']}"
         )
 
     @infobot_group.command()
     async def website(self, interaction: discord.Interaction) -> None:
         """Sends a link to the website."""
         await interaction.response.send_message(
-            f"Website: {self.client.config['LINKS']['WEBSITE']}"
+            f"Website: {self.client.config['links']['website']}"
         )
 
     @infobot_group.command()
     async def documentation(self, interaction: discord.Interaction) -> None:
         """Sends a link to the documentation."""
         await interaction.response.send_message(
-            f"Documentation: {self.client.config['LINKS']['DOCS']}",
+            f"Documentation: {self.client.config['links']['docs']}",
         )
 
     @infobot_group.command()
     async def support(self, interaction: discord.Interaction) -> None:
         """Sends a link to the support server."""
         await interaction.response.send_message(
-            f"Support: {self.client.config['LINKS']['SUPPORT']}"
+            f"Support: {self.client.config['links']['support']}"
         )
 
     @infobot_group.command()

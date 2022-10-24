@@ -39,7 +39,7 @@ class Utility(commands.Cog):
         """
         translate_response = await translate(
             message.content,
-            self.client.config["TRANSLATE"]["PRIMARY_LANGUAGE"],
+            self.client.config["translate"]["primary_language"],
             self.client.session,
         )
 

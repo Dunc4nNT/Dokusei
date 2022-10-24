@@ -36,29 +36,35 @@ CREATE DATABASE dokusei OWNER dokusei;
 
 Rename `config.py.example` to `config.py` and fill in the following values:
 
-```json
-"BOT": {
-    "TOKEN": "", // your bot's token
-    "DESCRIPTION": "Personal Discord Bot",
-    "STATS_WEBHOOK": "", // optional webhook to post stats in
-    "LOGGING_WEBHOOK": "", // optional webhook to post logging stuff in
+```py
+"bot": {
+    "token": "", # your bot's token
+    "description": "Personal Discord Bot",
+    "logging_webhook": "", # optional webhook to post logging stuff in
+    "stats_webhook": "", # optional webhook to post stats in
 },
-"TRANSLATE": {
-    "PRIMARY_LANGUAGE": "en", // language code from https://cloud.google.com/translate/docs/languages
+"translate": {
+    "primary_language": "en", # language code from https://cloud.google.com/translate/docs/languages
 },
-"DATABASE": {
-    "DSN": "postgres://dokusei:verysecurepassword@127.0.0.1:5432/dokusei", // replace with whatever password you created
+"database": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "user": "dokusei",
+    "password": "verysecurepassword", # change this to whatever password  you created
+    "database": "dokusei",
 },
-"LINKS": {
-    "REPO": "https://github.com/Dunc4nNT/Dokusei",
-    "WEBSITE": "https://dunc4nnt.github.io/Dokusei-Website/",
-    "DOCS": "https://dunc4nnt.github.io/Dokusei-Docs/",
-    "DASHBOARD": "https://dunc4nnt.github.io/Dokusei-Dashboard/",
-    "SUPPORT": "soon™",
+"links": {
+    "repository": "https://github.com/Dunc4nNT/Dokusei",
+    "website": "https://dunc4nnt.github.io/Dokusei-Website/",
+    "docs": "https://dunc4nnt.github.io/Dokusei-Docs/",
+    "dashboard": "https://dunc4nnt.github.io/Dokusei-Dashboard/",
+    "support": "soon™",
 },
-"DEV": {
-    "MODE": "development",  // development/production
-    "VERSION": "0.0.1", // just keep it on production, development mode has some extra dev things
+"dev": {
+    "mode": RunMode.PRODUCTION, # RunMode.DEVELOPMENT / RunMode.PRODUCTION
+    "version": VersionInfo(
+        major=0, minor=0, micro=1, releaselevel="alpha", serial=0
+    ),
 },
 ```
 

@@ -1,6 +1,15 @@
-LANG_CODES_LINK = "https://cloud.google.com/translate/docs/languages"
+from typing import TypedDict
 
-LANGUAGES = {
+LANG_CODES_LINK: str = "https://cloud.google.com/translate/docs/languages"
+
+
+class LanguageDict(TypedDict):
+    name: str
+    flag: str
+    top: bool
+
+
+LANGUAGES: dict[str, LanguageDict] = {
     "af": {"name": "Afrikaans", "flag": "🇿🇦", "top": True},
     "sq": {"name": "Albanian", "flag": "🇦🇱", "top": False},
     "am": {"name": "Amharic", "flag": "🇪🇹", "top": False},
@@ -137,7 +146,7 @@ LANGUAGES = {
     "zu": {"name": "Zulu", "flag": "", "top": False},
 }
 
-LANGUAGES_BY_NAME = {
+LANGUAGES_BY_NAME: dict[str, str] = {
     "Afrikaans": "af",
     "Albanian": "sq",
     "Amharic": "am",
