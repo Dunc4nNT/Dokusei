@@ -53,7 +53,7 @@ class DokuseiBot(commands.Bot):
                 await self.load_extension(extension)
             except commands.ExtensionError as error:
                 self.global_logger.exception(
-                    f"Failed to load extension: {extension}", error
+                    f"Failed to load extension: %s".format(extension), error
                 )
 
     async def on_ready(self):
@@ -164,7 +164,7 @@ class DokuseiBot(commands.Bot):
             "%Y-%m-%d %H:%M:%S"
         )
         message = textwrap.shorten(
-            f"{emojis.get(record.levelname, '🤷')}`{log_time}` **{record.name}** {record.message}",
+            f"{emojis.get(record.levelname, '🤷')}`{log_time}` **{record.name}** {record.message if hasattr(record, 'message') else ''}",
             2000,
         )
 

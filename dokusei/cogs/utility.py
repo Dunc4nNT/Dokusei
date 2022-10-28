@@ -54,7 +54,6 @@ class Utility(commands.Cog):
                 original_message_link=message.jump_url,
                 cooldown=30,
             ),
-            ephemeral=True,
         )
 
     utility_group = app_commands.Group(name="utility", description="Utility commands.")

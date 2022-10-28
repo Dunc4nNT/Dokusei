@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import TYPE_CHECKING, Annotated, Literal, Optional
 from urllib.parse import quote_plus
 
 import discord
@@ -10,7 +10,7 @@ from discord.ext import commands
 
 from dokusei.resources.eightball import RESPONSES
 from dokusei.utils.checks import CooldownOwnerBypass
-from dokusei.utils.utils import roll_die
+from dokusei.utils.utils import GuessTheTypes, generate_guessthe_choices, roll_die
 from dokusei.utils.views.fun import (
     CoinflipView,
     DiceRollView,
@@ -20,6 +20,7 @@ from dokusei.utils.views.fun import (
     diceroll_embed,
     import_embed,
 )
+from dokusei.utils.views.game import GuessTheView, guess_the_start_embed
 
 if TYPE_CHECKING:
     from dokusei import DokuseiBot
@@ -127,6 +128,40 @@ class Fun(commands.Cog):
                 mock_msg += char.upper()
 
         await interaction.response.send_message(content=mock_msg)
+
+    game_group = app_commands.Group(name="game", description="Game commands.")
+
+    @game_group.command()
+    async def guessthe(
+        self,
+        interaction: discord.Interaction,
+        type: GuessTheTypes,
+        difficulty: Annotated[
+            Literal["easy", "hard"], Optional[Literal["easy", "hard"]]
+        ] = "easy",
+    ) -> None:
+        """Guess The ..., get given an image and guess what it is.
+
+        :param type: what to guess, e.g. tank
+        :param difficulty: (optional) set the difficulty level, easy or hard
+        """
+        answer, image, choices = await generate_guessthe_choices(
+            type, difficulty, self.client.db_pool
+        )
+        embed = await guess_the_start_embed(type, image)
+        await interaction.response.send_message(
+            embed=embed,
+            view=GuessTheView(
+                author=interaction.user,
+                interaction=interaction,
+                type=type,
+                answer=answer,
+                image=image,
+                choices=choices,
+                difficulty=difficulty,
+                pool=self.client.db_pool,
+            ),
+        )
 
 
 async def setup(client: DokuseiBot):

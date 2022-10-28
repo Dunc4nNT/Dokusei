@@ -4,6 +4,7 @@ from datetime import timedelta
 from enum import Enum
 from typing import Literal, NamedTuple
 
+import asyncpg
 import discord
 
 
@@ -55,3 +56,65 @@ class VersionInfo(NamedTuple):
 class RunMode(Enum):
     DEVELOPMENT = 1
     PRODUCTION = 2
+
+
+class GuessTheTypes(Enum):
+    Tank = "tank"
+    Horror_Character = "horror character"
+
+
+class GuessTheChoice(NamedTuple):
+    name: str
+    correct: bool
+
+
+async def generate_guessthe_choices(
+    type: GuessTheTypes,
+    difficulty: Literal["easy", "hard"],
+    pool: asyncpg.Pool,
+    last_answer: str = "",
+) -> tuple[GuessTheChoice, str, list[GuessTheChoice]]:
+    answer, image = await _generate_random_answer(type, pool, last_answer)
+    if difficulty == "hard":
+        choices = await _generate_random_options(type, answer.name, 24, pool)
+    else:
+        choices = await _generate_random_options(type, answer.name, 3, pool)
+    choices.append(answer)
+    random.shuffle(choices)
+
+    return answer, image, choices
+
+
+async def _generate_random_answer(
+    type: GuessTheTypes, pool: asyncpg.Pool, last_answer: str
+) -> tuple[GuessTheChoice, str]:
+    match type:
+        case GuessTheTypes.Tank:
+            result = await pool.fetch(
+                "SELECT tank_name, image_link FROM tank_image WHERE tank_name != $1 ORDER BY RANDOM() LIMIT 1",
+                last_answer,
+            )
+            return GuessTheChoice(result[0].get("tank_name", "N/A"), True), result[
+                0
+            ].get("image_link", "N/A")
+        case _:
+            raise ValueError
+
+
+async def _generate_random_options(
+    type: GuessTheTypes, correct_answer: str, n: int, pool: asyncpg.Pool
+) -> list[GuessTheChoice]:
+    match type:
+        case GuessTheTypes.Tank:
+            query = "SELECT name FROM tank WHERE name != $1 ORDER BY RANDOM() LIMIT $2"
+            result = await pool.fetch(query, correct_answer, n)
+            return [GuessTheChoice(res["name"], False) for res in result]
+        case _:
+            raise ValueError
+
+
+async def get_tank_info(name: str, pool: asyncpg.Pool) -> asyncpg.Record:
+    result = await pool.fetch(
+        "SELECT name, manufactured, type, country FROM tank WHERE name = $1", name
+    )
+    return result[0]
