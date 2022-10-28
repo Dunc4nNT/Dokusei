@@ -148,8 +148,8 @@ class DiceRollView(BaseView):
         self.quantity = quantity
         self.result = result
 
-        self.add_item(DiceRollRepeatButton(self.sides, self.quantity))
-        self.add_item(DiceRollResultsButton(self.sides, self.quantity, self.result))
+        self.add_item(DiceRollRepeatButton())
+        self.add_item(DiceRollResultsButton())
         self.add_item(DiceRollSelect(self.quantity))
 
 
@@ -209,45 +209,48 @@ class DiceRollSelect(discord.ui.Select):
 
 
 class DiceRollRepeatButton(discord.ui.Button):
-    def __init__(self, sides: int, quantity: int) -> None:
+    def __init__(self) -> None:
         super().__init__(
             style=discord.ButtonStyle.primary, label="Roll Again", emoji="🔁"
         )
-        self.sides = sides
-        self.quantity = quantity
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        result = roll_die(self.sides, self.quantity)
-        embed = await diceroll_embed(self.sides, self.quantity, result)
+        if not self.view:
+            raise AttributeError("GuessTheButton is not used inside of a view")
+
+        result = roll_die(self.view.sides, self.view.quantity)
+        embed = await diceroll_embed(self.view.sides, self.view.quantity, result)
 
         await interaction.response.edit_message(
             embed=embed,
             view=DiceRollView(
                 author=interaction.user,
                 interaction=interaction,
-                sides=self.sides,
-                quantity=self.quantity,
+                sides=self.view.sides,
+                quantity=self.view.quantity,
                 result=result,
             ),
         )
 
 
 class DiceRollResultsButton(discord.ui.Button):
-    def __init__(self, sides: int, quantity: int, result: Counter[int]) -> None:
+    def __init__(self) -> None:
         super().__init__(
             style=discord.ButtonStyle.primary, label="Show All Results", emoji="📝"
         )
-        self.sides = sides
-        self.quantity = quantity
-        self.result = result
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        formatted_result = f"Rolled a {self.sides}-sided die {self.quantity} times.\n\n**Side** | **Amount of times**\n"
-        for k, v in self.result.most_common():
+        if not self.view:
+            raise AttributeError("GuessTheButton is not used inside of a view")
+
+        formatted_result = f"Rolled a {self.view.sides}-sided die {self.view.quantity} times.\n\n**Side** | **Amount of times**\n"
+        for k, v in self.view.result.most_common():
             formatted_result += f"{k} | {v}\n"
         buffer = BytesIO(formatted_result.encode("utf-8"))
 
-        await interaction.response.send_message(file=discord.File(fp=buffer, filename="diceroll.txt"))
+        await interaction.response.send_message(
+            file=discord.File(fp=buffer, filename="diceroll.txt")
+        )
 
 
 async def diceroll_embed(

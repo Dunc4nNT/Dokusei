@@ -34,27 +34,27 @@ class BotInfoView(BaseView):
             cooldown=cooldown,
             timeout=timeout,
         )
+        self.client = client
 
-        self.add_item(BotInfoSelect(client))
+        self.add_item(BotInfoSelect())
         self.add_item(
             discord.ui.Button(
                 label="Invite",
-                url=f"https://discord.com/oauth2/authorize?client_id={client.user.id}&scope=bot&permissions=8",
+                url=f"https://discord.com/oauth2/authorize?client_id={self.client.user.id}&scope=bot&permissions=8",
                 style=discord.ButtonStyle.link,
             )
         )
         self.add_item(
             discord.ui.Button(
                 label="Website",
-                url=client.config["links"]["website"],
+                url=self.client.config["links"]["website"],
                 style=discord.ButtonStyle.link,
             )
         )
 
 
 class BotInfoSelect(discord.ui.Select):
-    def __init__(self, client: DokuseiBot):
-        self.client: DokuseiBot = client
+    def __init__(self):
         options = [
             discord.SelectOption(
                 label="Client Information",
@@ -77,12 +77,15 @@ class BotInfoSelect(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.view:
+            raise AttributeError("GuessTheButton is not used inside of a view")
+
         match self.values[0]:
             case "0":
-                embed = await client_info_embed(self.client)
+                embed = await client_info_embed(self.view.client)
                 await interaction.response.edit_message(embed=embed)
             case "1":
-                embed = await system_info_embed(self.client)
+                embed = await system_info_embed(self.view.client)
                 await interaction.response.edit_message(embed=embed)
             case _:
                 pass

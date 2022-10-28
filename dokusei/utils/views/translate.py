@@ -27,16 +27,14 @@ class TranslationView(BaseView):
             cooldown=cooldown,
             timeout=timeout,
         )
+        self.translate_response = translate_response
+        self.original_message_link = original_message_link
 
-        self.add_item(TranslationSelect(translate_response, original_message_link))
+        self.add_item(TranslationSelect())
 
 
 class TranslationSelect(discord.ui.Select):
-    def __init__(
-        self, translate_response: TranslateResponse, original_message_link: str = ""
-    ):
-        self.translate_response = translate_response
-        self.original_message_link = original_message_link
+    def __init__(self):
         options = [
             discord.SelectOption(
                 label=LANGUAGES[language_code]["name"],
@@ -57,13 +55,18 @@ class TranslationSelect(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.view:
+            raise AttributeError("GuessTheButton is not used inside of a view")
+
         translate_response: TranslateResponse = await translate(
-            self.translate_response.source_message,
+            self.view.translate_response.source_message,
             self.values[0],
             interaction.client.session,  # type: ignore
         )
 
-        embed = await translation_embed(translate_response, self.original_message_link)
+        embed = await translation_embed(
+            translate_response, self.view.original_message_link
+        )
 
         await interaction.response.edit_message(embed=embed)
 
