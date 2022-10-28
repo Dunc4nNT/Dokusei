@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 from collections import Counter
+from io import BytesIO
 from typing import Optional
 
 import discord
@@ -241,17 +242,12 @@ class DiceRollResultsButton(discord.ui.Button):
         self.result = result
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        formatted_result = "**Side** | **Amount of times**\n"
+        formatted_result = f"Rolled a {self.sides}-sided die {self.quantity} times.\n\n**Side** | **Amount of times**\n"
         for k, v in self.result.most_common():
             formatted_result += f"{k} | {v}\n"
+        buffer = BytesIO(formatted_result.encode("utf-8"))
 
-        embed = discord.Embed(
-            title="Dice Roll Results",
-            description=f"Rolled a {self.sides}-sided die {self.quantity} times.\n\n{formatted_result}",
-            colour=0x3F3368,
-            timestamp=discord.utils.utcnow(),
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(file=discord.File(fp=buffer, filename="diceroll.txt"))
 
 
 async def diceroll_embed(
