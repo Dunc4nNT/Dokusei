@@ -68,6 +68,10 @@ Rename `config.py.example` to `config.py` and fill in the following values:
 },
 ```
 
+### Step 4. Initialising the database
+
+Run the `prepare.py` file by typing `py prepare.py`
+
 ### Step 5. Running the Bot
 
 Run the `main.py` file by typing `py main.py`
