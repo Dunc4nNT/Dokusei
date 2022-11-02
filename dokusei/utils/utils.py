@@ -59,8 +59,13 @@ class RunMode(Enum):
 
 
 class GuessTheTypes(Enum):
-    Tank = "tank"
-    Horror_Character = "horror character"
+    tank = "tank"
+    horror_character = "horror_character"
+
+
+class GuessTheDifficulties(Enum):
+    easy = "easy"
+    hard = "hard"
 
 
 class GuessTheChoice(NamedTuple):
@@ -70,7 +75,7 @@ class GuessTheChoice(NamedTuple):
 
 async def generate_guessthe_choices(
     type: GuessTheTypes,
-    difficulty: Literal["easy", "hard"],
+    difficulty: GuessTheDifficulties,
     pool: asyncpg.Pool,
     last_answer: str = "",
 ) -> tuple[GuessTheChoice, str, list[GuessTheChoice]]:
@@ -89,7 +94,7 @@ async def _generate_random_answer(
     type: GuessTheTypes, pool: asyncpg.Pool, last_answer: str
 ) -> tuple[GuessTheChoice, str]:
     match type:
-        case GuessTheTypes.Tank:
+        case GuessTheTypes.tank:
             result = await pool.fetch(
                 "SELECT tank_name, image_link FROM tank_image WHERE tank_name != $1 ORDER BY RANDOM() LIMIT 1",
                 last_answer,
@@ -105,7 +110,7 @@ async def _generate_random_options(
     type: GuessTheTypes, correct_answer: str, n: int, pool: asyncpg.Pool
 ) -> list[GuessTheChoice]:
     match type:
-        case GuessTheTypes.Tank:
+        case GuessTheTypes.tank:
             query = "SELECT name FROM tank WHERE name != $1 ORDER BY RANDOM() LIMIT $2"
             result = await pool.fetch(query, correct_answer, n)
             return [GuessTheChoice(res["name"], False) for res in result]

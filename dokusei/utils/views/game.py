@@ -1,12 +1,12 @@
-from typing import Literal, Optional
+from typing import Optional
 
 import asyncpg
 import discord
 
 from dokusei.utils.utils import (
     GuessTheChoice,
+    GuessTheDifficulties,
     GuessTheTypes,
-    TankInfo,
     generate_guessthe_choices,
     get_tank_info,
 )
@@ -22,7 +22,7 @@ class GuessTheView(BaseView):
         answer: GuessTheChoice,
         image: str,
         choices: list[GuessTheChoice],
-        difficulty: Literal["easy", "hard"],
+        difficulty: GuessTheDifficulties,
         pool: asyncpg.Pool,
         cooldown: float = 0,
         timeout: Optional[float] = 180,
@@ -79,6 +79,47 @@ class GuessTheReplayButton(discord.ui.Button):
         )
 
 
+class GuessTheDifficultySelect(discord.ui.Select):
+    def __init__(self, current_difficulty: GuessTheDifficulties):
+        super().__init__(
+            min_values=1,
+            max_values=1,
+            options=[
+                discord.SelectOption(label=difficulty.name)
+                for difficulty in GuessTheDifficulties
+            ],
+            placeholder=f"Adjust difficulty ({current_difficulty.name})",
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.view:
+            raise RuntimeError("GuessTheSelect is not used inside of a view")
+
+        self.view.difficulty = GuessTheDifficulties(self.values[0])
+        self.placeholder = f"Adjust difficulty ({self.view.difficulty.name})"
+
+        await interaction.response.edit_message(view=self.view)
+
+
+class GuessTheChangeTypeSelect(discord.ui.Select):
+    def __init__(self, current_type: GuessTheTypes):
+        super().__init__(
+            min_values=1,
+            max_values=1,
+            options=[discord.SelectOption(label=type.name) for type in GuessTheTypes],
+            placeholder=f"Change mode ({current_type.name})",
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.view:
+            raise RuntimeError("GuessTheChangeTypeSelect is not used inside of a view")
+
+        self.view.type = GuessTheTypes(self.values[0])
+        self.placeholder = f"Adjust difficulty ({self.view.type.name})"
+
+        await interaction.response.edit_message(view=self.view)
+
+
 class GuessTheButton(discord.ui.Button):
     def __init__(self, choice: GuessTheChoice) -> None:
         super().__init__(
@@ -99,6 +140,8 @@ class GuessTheButton(discord.ui.Button):
         )
         self.view.clear_items()
         self.view.add_item(GuessTheReplayButton())
+        self.view.add_item(GuessTheDifficultySelect(self.view.difficulty))
+        self.view.add_item(GuessTheChangeTypeSelect(self.view.type))
 
         await interaction.response.edit_message(embed=embed, view=self.view)
 
@@ -125,6 +168,8 @@ class GuessTheSelect(discord.ui.Select):
         )
         self.view.clear_items()
         self.view.add_item(GuessTheReplayButton())
+        self.view.add_item(GuessTheDifficultySelect(self.view.difficulty))
+        self.view.add_item(GuessTheChangeTypeSelect(self.view.type))
 
         await interaction.response.edit_message(embed=embed, view=self.view)
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Annotated, Literal, Optional
+from typing import TYPE_CHECKING, Annotated, Optional
 from urllib.parse import quote_plus
 
 import discord
@@ -10,7 +10,12 @@ from discord.ext import commands
 
 from dokusei.resources.eightball import RESPONSES
 from dokusei.utils.checks import CooldownOwnerBypass
-from dokusei.utils.utils import GuessTheTypes, generate_guessthe_choices, roll_die
+from dokusei.utils.utils import (
+    GuessTheDifficulties,
+    GuessTheTypes,
+    generate_guessthe_choices,
+    roll_die,
+)
 from dokusei.utils.views.fun import (
     CoinflipView,
     DiceRollView,
@@ -137,8 +142,8 @@ class Fun(commands.Cog):
         interaction: discord.Interaction,
         type: GuessTheTypes,
         difficulty: Annotated[
-            Literal["easy", "hard"], Optional[Literal["easy", "hard"]]
-        ] = "easy",
+            GuessTheDifficulties, Optional[GuessTheDifficulties]
+        ] = GuessTheDifficulties.easy,
     ) -> None:
         """Guess The ..., get given an image and guess what it is.
 
