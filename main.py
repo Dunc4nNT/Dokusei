@@ -50,23 +50,26 @@ async def main() -> None:
         if ext.name != "__init__.py"
     ]
 
-    async with aiohttp.ClientSession() as session, asyncpg.create_pool(
-        host=config["database"]["host"],
-        port=config["database"]["port"],
-        user=config["database"]["user"],
-        password=config["database"]["password"],
-        database=config["database"]["database"],
-        command_timeout=30,
-    ) as pool:
-        async with DokuseiBot(
+    async with (
+        aiohttp.ClientSession() as session,
+        asyncpg.create_pool(
+            host=config["database"]["host"],
+            port=config["database"]["port"],
+            user=config["database"]["user"],
+            password=config["database"]["password"],
+            database=config["database"]["database"],
+            command_timeout=30,
+        ) as pool,
+        DokuseiBot(
             description=config["bot"]["description"],
             intents=intents,
             initial_extensions=initial_extensions,
             session=session,
             db_pool=pool,
             config=config,
-        ) as client:
-            await client.start(config["bot"]["token"])
+        ) as client,
+    ):
+        await client.start(config["bot"]["token"])
 
 
 if __name__ == "__main__":

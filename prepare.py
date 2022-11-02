@@ -13,18 +13,16 @@ class Migrations:
         self.initial_data = sorted(list(Path("dokusei/resources/sql").glob("*.sql")))
 
     async def migrate(self) -> None:
-        async with self.pool.acquire() as connection:
-            async with connection.transaction():
-                for migration in self.migrations:
-                    raw_sql = migration.read_text("utf-8")
-                    await self.pool.execute(raw_sql)
+        async with (self.pool.acquire() as connection, connection.transaction()):
+            for migration in self.migrations:
+                raw_sql = migration.read_text("utf-8")
+                await self.pool.execute(raw_sql)
 
     async def create_initial_data(self) -> None:
-        async with self.pool.acquire() as connection:
-            async with connection.transaction():
-                for data_file in self.initial_data:
-                    raw_sql = data_file.read_text("utf-8")
-                    await self.pool.execute(raw_sql)
+        async with (self.pool.acquire() as connection, connection.transaction()):
+            for data_file in self.initial_data:
+                raw_sql = data_file.read_text("utf-8")
+                await self.pool.execute(raw_sql)
 
 
 async def main():
