@@ -3,7 +3,13 @@ from typing import Literal, Optional
 import asyncpg
 import discord
 
-from dokusei.utils.utils import GuessTheChoice, GuessTheTypes, generate_guessthe_choices
+from dokusei.utils.utils import (
+    GuessTheChoice,
+    GuessTheTypes,
+    TankInfo,
+    generate_guessthe_choices,
+    get_tank_info,
+)
 from dokusei.utils.views.base import BaseView
 
 
@@ -74,10 +80,7 @@ class GuessTheReplayButton(discord.ui.Button):
 
 
 class GuessTheButton(discord.ui.Button):
-    def __init__(
-        self,
-        choice: GuessTheChoice,
-    ) -> None:
+    def __init__(self, choice: GuessTheChoice) -> None:
         super().__init__(
             style=discord.ButtonStyle.primary,
             label=choice.name,
@@ -88,7 +91,11 @@ class GuessTheButton(discord.ui.Button):
             raise AttributeError("GuessTheButton is not used inside of a view")
 
         embed = await guess_the_finish_embed(
-            self.view.type, self.view.answer, self.view.image, self.label  # type: ignore
+            self.view.type,
+            self.view.answer,
+            self.view.image,
+            self.label,  # type: ignore
+            self.view.pool,
         )
         self.view.clear_items()
         self.view.add_item(GuessTheReplayButton())
@@ -110,7 +117,11 @@ class GuessTheSelect(discord.ui.Select):
             raise RuntimeError("GuessTheSelect is not used inside of a view")
 
         embed = await guess_the_finish_embed(
-            self.view.type, self.view.answer, self.view.image, self.values[0]
+            self.view.type,
+            self.view.answer,
+            self.view.image,
+            self.values[0],
+            self.view.pool,
         )
         self.view.clear_items()
         self.view.add_item(GuessTheReplayButton())
@@ -121,6 +132,7 @@ class GuessTheSelect(discord.ui.Select):
 async def guess_the_start_embed(type: GuessTheTypes, image: str) -> discord.Embed:
     embed = discord.Embed(
         title=f"Guess The {type.value.capitalize()}",
+        description="Guess which tank is in this image.",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )
@@ -130,17 +142,25 @@ async def guess_the_start_embed(type: GuessTheTypes, image: str) -> discord.Embe
 
 
 async def guess_the_finish_embed(
-    type: GuessTheTypes, answer: GuessTheChoice, image: str, chosen: str
+    type: GuessTheTypes,
+    answer: GuessTheChoice,
+    image: str,
+    chosen: str,
+    pool: asyncpg.Pool,
 ) -> discord.Embed:
+    correct_tank_info = await get_tank_info(answer.name, pool)
     if answer.name == chosen:
         description = (
             f"You chose the correct answer! It is indeed a(n) **{answer.name}**"
         )
     else:
         description = f"That answer is incorrect, the correct answer is **{answer.name}**.\nYou chose **{chosen}**."
+    additional_info = f"The {correct_tank_info.name} is a(n) {correct_tank_info.type} from (the) {correct_tank_info.country}."
+    if not correct_tank_info.manufactured:
+        additional_info += " Only designs and/or prototypes were made for this tank."
     embed = discord.Embed(
         title=f"Guess The {type.value.capitalize()}",
-        description=description,
+        description=f"{description}\n\n{additional_info}",
         colour=0x3F3368,
         timestamp=discord.utils.utcnow(),
     )

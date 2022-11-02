@@ -113,8 +113,16 @@ async def _generate_random_options(
             raise ValueError
 
 
-async def get_tank_info(name: str, pool: asyncpg.Pool) -> asyncpg.Record:
+class TankInfo(NamedTuple):
+    name: str
+    manufactured: bool
+    type: str
+    country: str
+
+
+async def get_tank_info(name: str, pool: asyncpg.Pool) -> TankInfo:
     result = await pool.fetch(
         "SELECT name, manufactured, type, country FROM tank WHERE name = $1", name
     )
-    return result[0]
+    tank = result[0]
+    return TankInfo(tank["name"], tank["manufactured"], tank["type"], tank["country"])
